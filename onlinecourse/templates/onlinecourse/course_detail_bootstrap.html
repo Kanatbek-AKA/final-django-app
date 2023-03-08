@@ -19,7 +19,7 @@
       src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
     ></script>
 
-    <!--{% comment %}<script defer src="{% get_static_prefix %}javascript/course.js"></script>{% endcomment %} -->
+    <!--{% comment %}<script defer src="{% get_static_prefix %}javascript/course.js"></script>{% endcomment %}  -->
 
     <meta charset="UTF-8" />
   </head>
@@ -89,10 +89,6 @@
         </div>
         {% endfor %}
       </div>
-      <!-- Task: show questions and choices -->
-      <!-- <HINT> Use Bootstrap Collapse to hide exam first, more details could be found here
-            https://www.w3schools.com/bootstrap4/bootstrap_collapse.asp-->
-
       <!-- {% comment %} A collapse example here: {% endcomment %} -->
       <input
         value="Answer questions"
@@ -126,7 +122,13 @@
         >
           {% for question in course.question_set.all %}
           <div class="card mt-1">
-            <div class="card-header"><h5>{{ question.question_text}}</h5></div>
+            <div class="card-header">
+              <h5>{{question.id }}. {{ question }}</h5>
+              <span class="text-muted"
+                ><small>select one or more answers </small></span
+              >
+            </div>
+            <!--{% comment %} question.question_text did not display? {% endcomment %} -->
             {% csrf_token %}
             <div class="form-group">
               {% for choice in question.choice_set.all %}
@@ -139,7 +141,6 @@
                     id="{{choice.id}}"
                     value="{{choice.id}}"
                   />{{ choice }}
-                  <!--{% comment %} choice.choice_text with ABC did not display? {% endcomment %} -->
                 </label>
               </div>
               {% endfor %}
@@ -176,23 +177,16 @@
 
         for (let i = 0; i < checkbox.length; i++) {
           if (checkbox[i].checked) {
-            console.log(checkbox[i].checked);
             checked = true;
             break;
-          } else if (checkbox[i].unchecked) {
-            console.log(checkbox[i].unchecked);
-            checkbox[i].unchecked.value.focus();
           }
         }
 
         if (checked) {
           txt.innerHTML =
-            "<strong style='color:red;'>Now you can submit your exam answer by clicking on Submit button below.</strong>";
+            "<strong style='color:red;'>Click on button submit below.</strong>";
           // document.querySelector('form').submit();
         } else {
-          // if (!checked) {
-          //  checkbox[i].unchecked.value.focus() }
-
           txt.textContent = "Please check the boxes to submit your answer";
           //   txt.classList.toggle("exam_warn--hidden");
         }

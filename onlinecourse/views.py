@@ -8,7 +8,7 @@ from django.views import generic
 from django.contrib.auth import login, logout, authenticate
 import logging 
 # <HINT> Import any new Models here
-from .models import Course, Enrollment, Submission, examGrades, Question, Choice, Course, Learner, Instructor
+from .models import Course, Enrollment, Lesson, Submission, examGrades, Question, Choice, Course, Learner, Instructor
 # 
 # from django.core.mail import send_mail, BadHeaderError, EmailMessage, mail
 
@@ -115,20 +115,19 @@ def enroll(request, course_id):
          # Collect the selected choices from exam form
          # Add each selected choice object to the submission object
          # Redirect to show_exam_result with the submission id
-def submit(request, course_id):    # 
+def submit(request, course_id):    
     user = request.user
     course = get_object_or_404(Course, pk=course_id)
-    submission = Submission.objects.all()
-    try:
-        if request.method == 'POST' :
-            selected = request.POST.getlist('choice_id') # getlist()
-            exams = examGrades.objects.create(course=course, exam_answer=extract_answers(selected))
-            exams.save()            
-            return redirect(show_exam_result(course_id, submission.id) )
+    enrollment = Enrollment.objects.get(user=user, course=course)
+    submission = Submission.objects.create(enrollment=enrollment)
+    try:  # 
+        get_result = extract_answers(request)
+        submission.choices.set(get_result)
+        return HttpResponseRedirect(reverse(viewname='onlinecourse:show_exam_result', args=(course.id, submission.id)))
     except Exception as err:
         return HttpResponse('Catched error ', str(err))
 
-    # return HttpResponseRedirect(reverse(viewname='onlinecourse:show_exam_result', args=(course.id,)))
+    # return HttpResponseRedirect(reverse(viewname='onlinecourse:show_exam_result', args=(course.id, submission.id)))
 
 # <HINT> A example method to collect the selected choices from the exam form from the request object
 def extract_answers(request):
@@ -141,22 +140,29 @@ def extract_answers(request):
    return submitted_anwsers
 
 
+# TODO 
+# Create a function to ramdom the question by re-taking exam
+# def re_take_exam(request, course_id) :
+    # doing something....
+
 # <HINT> Create an exam result view to check if learner passed exam and show their question results and result for each question,
 # you may implement it based on the following logic:
         # Get course and submission based on their ids
         # Get the selected choice ids from the submission record
         # For each selected choice, check if it is a correct answer or not
         # Calculate the total score
-def show_exam_result(request, course_id, submission_id):
+from django.db.models import Avg, Case, Count, F, Max, Min, Prefetch, Q, Sum, When
+
+def show_exam_result(request, course_id,  submission_id):
     total = {}
     course = get_object_or_404(Course, pk=course_id)
-    submission = Submission.objects.get(id=submission_id)
+    submission = Submission.objects.get(id=submission_id)       
     choices = submission.choices.all()
     total_score = 0
-    for choice in choices :
+    for choice in choices:
         if choice.is_correct:
-            total_score += choice.question_id.grade
-    total['course'] = course
-    total['grade'] = total_score    # 
+            total_score += choice.question_id #.grade
+    total['course'] = course 
+    total['grade'] =  total_score    # 
     total['choices'] = choices
-    return render(request, 'onlinecourse/exam_result_bootrap.html', total)
+    return render(request, 'onlinecourse/exam_result_bootstrap.html', total)
