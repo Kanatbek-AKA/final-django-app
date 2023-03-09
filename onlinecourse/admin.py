@@ -6,20 +6,23 @@ from .models import Course, Lesson, Instructor, Learner, Question, Choice, Submi
 class QuestionInLine(admin.StackedInline):
     model = Question
     extra = 5
-    
+    # function
+
 class ChoiceInline(admin.StackedInline):
     model = Choice 
     extra = 3
+    # function
 
 class LessonInline(admin.StackedInline):
     model = Lesson
     extra = 5
-        
+      
+
 # Additional 
 class ExameGradeInline(admin.StackedInline):
     list_display = ['course', 'exam_question', 'exam_answer', 'grade']
     model = examGrades
-        
+    # define function 
     
 # Register your models here.
 @admin.register(Course)                       # define register of Course here using @

@@ -52,9 +52,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_cleanup.apps.CleanupConfig',
-    'django_pdb',
-    'django_extensions',
-    'component_tags',
+    #'django_pdb',
+    #'django_extensions',
+    #'component_tags',
     
 ]
 

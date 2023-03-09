@@ -159,10 +159,14 @@ def show_exam_result(request, course_id,  submission_id):
     submission = Submission.objects.get(id=submission_id)       
     choices = submission.choices.all()
     total_score = 0
+    total_wrong = 0
     for choice in choices:
         if choice.is_correct:
             total_score += choice.question_id #.grade
+        else: 
+            total_wrong += choice.question_id
+            # print(total_wrong)
     total['course'] = course 
-    total['grade'] =  total_score    # 
-    total['choices'] = choices
+    total['grade'] =  round((100*(total_score - total_wrong)/total_score), 2)    # exam_grade_formula = 100 × (total - wrong) / total
+    total['choices'] = choices  
     return render(request, 'onlinecourse/exam_result_bootstrap.html', total)
